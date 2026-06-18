@@ -94,13 +94,15 @@ while size < 3000:
 
 ```
 
+![Attaching Process](images/1_immunityAttach.png)
+
 After multiple iterations, the application crashed when processing an oversized input, indicating the presence of a potential buffer overflow vulnerability. The debugger confirmed that critical memory structures were being affected during the crash.
 
-
+![Fuzzing Process](images/1_crash1200.png)
 
 #### Evidence
 
-![Fuzzing Process](images/fuzzing.png)
+![Fuzzing Result](images/1_errorMessage.png)
 
 ---
 
