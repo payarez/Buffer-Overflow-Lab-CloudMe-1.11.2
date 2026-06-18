@@ -228,19 +228,31 @@ _No BadChars Found_
 
 ---
 
-### Phase 5: Memory Analysis
+### Phase 5: Find JMP-ESP | Memory Analysis
 
-A suitable instruction sequence was located within the process memory to redirect execution flow.
+```
+msf-nasm_shell
+nasm > JMP ESP
+=> FFE4
+```
 
-#### Objectives
+The memory space of the application was analyzed to study loaded modules and evaluate the presence or absence of modern security protections.
 
-- Analyze loaded modules.
-- Locate executable memory regions.
-- Understand control flow redirection.
+Particular attention was given to mechanisms such as Address Space Layout Randomization (ASLR), Data Execution Prevention (DEP), and SafeSEH. This phase helped explain why the application was susceptible to memory corruption attacks and highlighted the importance of secure software design.
+
+```
+!mona find -s "\xff\xe4" -m qt5core.dll
+```
+ _Using mona.py to find qt5core.dll opcode_
+
+ ![Memory Analysis](images/5_noProtectionModule.png)
+
+0x68e05735  →  \x35\x57\xe0\x68  (Little Endian)
+ _JMP ESP address selected_
 
 #### Evidence
 
-![Memory Analysis](images/memory-analysis.png)
+![JMP-ESP selected](images/5_jmpSelected.png)
 
 ---
 
